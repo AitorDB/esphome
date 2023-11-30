@@ -92,6 +92,9 @@ void RC522::initialize_() {
   pcd_write_register(MODE_REG, 0x3D);  // Default 0x3F. Set the preset value for the CRC coprocessor for the CalcCRC
                                        // command to 0x6363 (ISO 14443-3 part 6.2.4)
 
+  // Push gain from configuration
+  pcd_write_register(RF_CFG_REG, ((gain_ & 0x07) << 4) | 0x08);
+
   state_ = STATE_INIT;
 }
 
@@ -106,6 +109,7 @@ void RC522::dump_config() {
   }
 
   LOG_PIN("  RESET Pin: ", this->reset_pin_);
+  ESP_LOGCONFIG(TAG, "  Gain: %d", this->gain_);
 
   LOG_UPDATE_INTERVAL(this);
 

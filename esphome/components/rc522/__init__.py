@@ -7,6 +7,7 @@ from esphome.const import (
     CONF_ON_TAG_REMOVED,
     CONF_TRIGGER_ID,
     CONF_RESET_PIN,
+    CONF_GAIN,
 )
 
 CODEOWNERS = ["@glmnet"]
@@ -34,6 +35,7 @@ RC522_SCHEMA = cv.Schema(
                 cv.GenerateID(CONF_TRIGGER_ID): cv.declare_id(RC522Trigger),
             }
         ),
+        cv.Optional(CONF_GAIN, default=4): cv.int_range(min=0, max=7),
     }
 ).extend(cv.polling_component_schema("1s"))
 
@@ -44,6 +46,8 @@ async def setup_rc522(var, config):
     if CONF_RESET_PIN in config:
         reset = await cg.gpio_pin_expression(config[CONF_RESET_PIN])
         cg.add(var.set_reset_pin(reset))
+    
+    cg.add(var.set_gain(config[CONF_GAIN]))
 
     for conf in config.get(CONF_ON_TAG, []):
         trigger = cg.new_Pvariable(conf[CONF_TRIGGER_ID])
